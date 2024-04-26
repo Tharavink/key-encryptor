@@ -1,0 +1,32 @@
+{
+	"name": "key-generator",
+	"version": "1.0.0",
+	"description": "Generates private key from certificate",
+	"main": "index.js",
+	"scripts": {
+		"deploy:local": "serverless deploy --stage local && npm run prepare:localstack",
+		"remove:local": "serverless remove --stage local",
+		"invoke:local": "serverless invoke local -f key-generator --path src/test-data/valid-data.json",
+		"invoke:local:invalid": "serverless invoke local -f key-generator --path src/test-data/invalid-data.json",
+		"test": "jest",
+		"prepare:localstack": "awslocal s3 cp ./src/test/valid-cert/certificate.pem s3://certs/certificate.pem"
+	},
+	"author": "Tharavink Prasad Sivarajan <tharavink@havence.com.sg>",
+	"license": "ISC",
+	"dependencies": {
+		"@aws-sdk/client-dynamodb": "^3.556.0",
+		"@aws-sdk/client-s3": "^3.556.0",
+		"dotenv": "^16.4.5"
+	},
+	"devDependencies": {
+		"@types/aws-lambda": "^8.10.137",
+		"@types/jest": "^29.5.12",
+		"@types/node": "^20.12.7",
+		"jest": "^29.7.0",
+		"serverless-localstack": "^1.2.0",
+		"serverless-plugin-typescript": "^2.1.5",
+		"ts-jest": "^29.1.2",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.4.5"
+	}
+}

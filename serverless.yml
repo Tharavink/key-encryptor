@@ -1,0 +1,95 @@
+org: tharavink
+app: key-generator
+service: key-generator
+frameworkVersion: "3"
+useDotenv: true
+
+provider:
+    name: aws
+    runtime: nodejs18.x
+    stage: local
+    region: ap-southeast-1
+    environment:
+        DYNAMODB_TABLE_NAME: ${env:DYNAMODB_TABLE_NAME}
+        S3_BUCKET_NAME: ${env:S3_BUCKET_NAME}
+
+plugins:
+    - serverless-plugin-typescript
+    - serverless-localstack
+
+custom:
+    localstack:
+        stages:
+            - local
+        host: http://localhost
+        edgePort: 4566
+        autostart: false
+        lambda:
+            mountCode: True
+
+resources:
+    Resources:
+        KeyGeneratorTable:
+            Type: AWS::DynamoDB::Table
+            Properties:
+                TableName: ${self:provider.environment.DYNAMODB_TABLE_NAME}
+                AttributeDefinitions:
+                    - AttributeName: commonName
+                      AttributeType: S
+                    - AttributeName: createdAt
+                      AttributeType: S
+                KeySchema:
+                    - AttributeName: commonName
+                      KeyType: HASH
+                    - AttributeName: createdAt
+                      KeyType: RANGE
+                ProvisionedThroughput:
+                    ReadCapacityUnits: 2
+                    WriteCapacityUnits: 5
+        CertsBucket:
+            Type: AWS::S3::Bucket
+            Properties:
+                BucketName: ${self:provider.environment.S3_BUCKET_NAME}
+        KeyGeneratorRole:
+            Type: AWS::IAM::Role
+            Properties:
+                AssumeRolePolicyDocument:
+                    Version: "2012-10-17"
+                    Statement:
+                        - Effect: "Allow"
+                          Principal:
+                              Service:
+                                  - lambda.amazonaws.com
+                          Action: "sts:AssumeRole"
+                Policies:
+                    - PolicyName: key-generator
+                      PolicyDocument:
+                          Version: "2012-10-17"
+                          Statement:
+                              - Effect: "Allow"
+                                Action:
+                                    - "dynamodb:List*"
+                                    - "dynamodb:DescribeReservedCapacity*"
+                                    - "dynamodb:DescribeLimits"
+                                    - "dynamodb:DescribeTimeToLive"
+                                    - "dynamodb:DescribeTable"
+                                    - "dynamodb:PutItem"
+                                Resource: "arn:aws:dynamodb:*:*:table/${self:provider.environment.DYNAMODB_TABLE_NAME}"
+                              - Effect: "Allow"
+                                Action:
+                                    - "s3:GetObject"
+                                Resource: "arn:aws:s3:::${self:provider.environment.S3_BUCKET_NAME}/*"
+                              - Effect: "Allow"
+                                Action:
+                                    - "s3:ListBucket"
+                                    - "s3:GetBucketLocation"
+                                Resource: "arn:aws:s3:::${self:provider.environment.S3_BUCKET_NAME}"
+
+package:
+    patterns:
+        - serverless.yml
+
+functions:
+    key-generator:
+        role: KeyGeneratorRole
+        handler: handler.generateKey
