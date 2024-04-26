@@ -7,7 +7,6 @@ This project does the following
 - Save the CommonName and signed content to DynamoDB
 
 # Prerequisite
----
 ### Using LocalStack (Preferred)
 ##### Installation
 - You need to have Docker installed. The easiest method to install Docker is by using [Docker Desktop](https://www.docker.com/products/docker-desktop/)
@@ -141,7 +140,6 @@ Optionally, you can open LocalStack Desktop to view the resources
   ```
 
 # Running in Local
----
 - Create **.env** at root of the project folder
   ```env
 	AWS_ENDPOINT=
@@ -189,12 +187,10 @@ Optionally, you can open LocalStack Desktop to view the resources
   ```
 
 # Testing
----
 - Running unit test for all services
   ```bash
 	npm run test
   ```
 
 # Support
----
 Do not hesitate to contact me at tharavink619@gmail.com.
