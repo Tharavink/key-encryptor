@@ -144,10 +144,10 @@ Optionally, you can open LocalStack Desktop to view the resources
 ---
 - Create **.env** at root of the project folder
   ```env
-	AWS_ENDPOINT=http://localhost:4566
+	AWS_ENDPOINT=
 	AWS_REGION=
 
-	S3_ENDPOINT=http://s3.localhost.localstack.cloud:4566
+	S3_ENDPOINT=
 	S3_BUCKET_NAME=
 
 	DYNAMODB_TABLE_NAME=
